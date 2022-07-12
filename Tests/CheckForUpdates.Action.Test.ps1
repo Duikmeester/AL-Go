@@ -14,9 +14,9 @@ Describe "CheckForUpdates Action Tests" {
 
     It 'Test action.yaml matches script' {
         $permissions = [ordered]@{
-            "contents" = "write"
+            "contents"      = "write"
             "pull-requests" = "write"
-            "workflows" = "write"
+            "workflows"     = "write"
         }
         $outputs = [ordered]@{
         }

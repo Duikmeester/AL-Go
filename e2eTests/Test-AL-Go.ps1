@@ -11,15 +11,15 @@
     [switch] $private
 )
 
-#  ______           _ ___                _    _           _                                    _       
-# |  ____|         | |__ \              | |  | |         | |                                  (_)      
-# | |__   _ __   __| |  ) |___ _ __   __| |  | |_ ___ ___| |_    ___  ___ ___ _ __   __ _ _ __ _  ___  
-# |  __| | '_ \ / _` | / // _ \ '_ \ / _` |  | __/ _ \ __| __|  / __|/ __/ _ \ '_ \ / _` | '__| |/ _ \ 
+#  ______           _ ___                _    _           _                                    _
+# |  ____|         | |__ \              | |  | |         | |                                  (_)
+# | |__   _ __   __| |  ) |___ _ __   __| |  | |_ ___ ___| |_    ___  ___ ___ _ __   __ _ _ __ _  ___
+# |  __| | '_ \ / _` | / // _ \ '_ \ / _` |  | __/ _ \ __| __|  / __|/ __/ _ \ '_ \ / _` | '__| |/ _ \
 # | |____| | | | (_| |/ /_  __/ | | | (_| |  | |_  __\__ \ |_   \__ \ (__  __/ | | | (_| | |  | | (_) |
-# |______|_| |_|\__,_|____\___|_| |_|\__,_|   \__\___|___/\__|  |___/\___\___|_| |_|\__,_|_|  |_|\___/ 
+# |______|_| |_|\__,_|____\___|_| |_|\__,_|   \__\___|___/\__|  |___/\___\___|_| |_|\__,_|_|  |_|\___/
 #
 # This scenario runs for both PTE template and AppSource App template and as single project and multi project repositories
-#                                                                                                      
+#
 #  1. Login to GitHub
 #  2. Create a new repository based on the selected template
 #  3. If (AppSource App) Create a licensefileurl secret
@@ -54,7 +54,7 @@
 # 29.  Test that the number of workflows ran is correct.
 # 30. Cleanup repositories
 #
-  
+
 $ErrorActionPreference = "stop"
 Set-StrictMode -Version 2.0
 
@@ -63,7 +63,7 @@ try {
     Import-Module (Join-Path $PSScriptRoot "e2eTestHelper.psm1") -DisableNameChecking
 
     if (!$github) {
-        if (!$token) {  $token = (Get-AzKeyVaultSecret -VaultName "BuildVariables" -Name "OrgPAT").SecretValue | Get-PlainText }
+        if (!$token) { $token = (Get-AzKeyVaultSecret -VaultName "BuildVariables" -Name "OrgPAT").SecretValue | Get-PlainText }
         $githubOwner = "freddydk"
         if (!$adminCenterApiCredentials) { $adminCenterApiCredentials = (Get-AzKeyVaultSecret -VaultName "BuildVariables" -Name "adminCenterApiCredentials").SecretValue | Get-PlainText }
         if (!$licenseFileUrl) { $licenseFileUrl = (Get-AzKeyVaultSecret -VaultName "BuildVariables" -Name "licenseFile").SecretValue | Get-PlainText }
@@ -73,7 +73,7 @@ try {
     $reponame = [System.IO.Path]::GetFileNameWithoutExtension([System.IO.Path]::GetTempFileName())
     $repository = "$githubOwner/$repoName"
     $branch = "main"
-    
+
     if ($appSourceApp) {
         $sampleApp1 = "https://businesscentralapps.blob.core.windows.net/githubhelloworld-appsource-preview/2.0.47.0/apps.zip"
         $sampleTestApp1 = "https://businesscentralapps.blob.core.windows.net/githubhelloworld-appsource-preview/2.0.47.0/testapps.zip"
@@ -128,7 +128,7 @@ try {
     if ($adminCenterApiCredentials) {
         $adminCenterApiCredentialsSecret = ConvertTo-SecureString -String $adminCenterApiCredentials -AsPlainText -Force
     }
-    
+
     # Login
     SetTokenAndRepository -githubOwner $githubOwner -token $token -repository $repository -github:$github
 
@@ -160,7 +160,7 @@ try {
 
     Test-NumberOfRuns -expectedNumberOfRuns $runs
     Test-ArtifactsFromRun -runid $run.id -expectedNumberOfApps 2 -expectedNumberOfTestApps 1 -expectedNumberOfTests 1 -folder 'artifacts' -repoVersion '1.0.' -appVersion ''
-    
+
     # Create Release
     Run-CreateRelease -appVersion "1.0.$($runs-2).0" -name '1.0' -tag '1.0' -wait -branch $branch | Out-Null
     $runs++
@@ -174,17 +174,17 @@ try {
             Add-PropertiesToJsonFile -jsonFile "$($project2Folder).AL-Go\settings.json" -properties @{ "AppSourceCopMandatoryAffixes" = @( "cus" ) }
             $runs++
         }
-        Copy-Item -path "$($project1Folder)Default App Name\logo\helloworld256x240.png" -Destination "$($project2Folder)My App\helloworld256x240.png"
+        Copy-Item -Path "$($project1Folder)Default App Name\logo\helloworld256x240.png" -Destination "$($project2Folder)My App\helloworld256x240.png"
         Add-PropertiesToJsonFile -jsonFile "$($project2Folder)My App\app.json" -properties @{
-            "brief" = "Hello World for AppSource"
-            "description" = "Hello World sample app for AppSource"
-            "logo" = "helloworld256x240.png"
-            "url" = "https://dev.azure.com/businesscentralapps/HelloWorld.AppSource"
-            "EULA" = "https://dev.azure.com/businesscentralapps/HelloWorld.AppSource"
-            "privacyStatement" = "https://dev.azure.com/businesscentralapps/HelloWorld.AppSource"
-            "help" = "https://dev.azure.com/businesscentralapps/HelloWorld.AppSource"
+            "brief"                   = "Hello World for AppSource"
+            "description"             = "Hello World sample app for AppSource"
+            "logo"                    = "helloworld256x240.png"
+            "url"                     = "https://dev.azure.com/businesscentralapps/HelloWorld.AppSource"
+            "EULA"                    = "https://dev.azure.com/businesscentralapps/HelloWorld.AppSource"
+            "privacyStatement"        = "https://dev.azure.com/businesscentralapps/HelloWorld.AppSource"
+            "help"                    = "https://dev.azure.com/businesscentralapps/HelloWorld.AppSource"
             "contextSensitiveHelpUrl" = "https://dev.azure.com/businesscentralapps/HelloWorld.AppSource"
-            "features" = @( "TranslationFile" )
+            "features"                = @( "TranslationFile" )
         }
         $runs++
     }
@@ -260,9 +260,9 @@ try {
     $runTestNextMajor = Run-TestNextMajor -branch $branch
 
     # TODO: Test workspace
-    
+
     # TODO: Test Release
-    
+
     # TODO: Test Release notes
 
     # TODO: Check that environment was created and that launch.json was updated
@@ -279,7 +279,7 @@ try {
     $runs++
 
     Test-NumberOfRuns -expectedNumberOfRuns $runs
-    
+
     RemoveRepository -repository $repository -path $repoPath
 }
 catch {

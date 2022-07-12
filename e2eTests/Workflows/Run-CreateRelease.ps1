@@ -12,10 +12,10 @@
     $workflowName = 'Create release'
     $parameters = @{
         "appVersion" = $appVersion
-        "name" = $name
-        "tag" = $tag
-        "draft" = @("Y","N")[!$draft]
-        "prerelease" = @("Y","N")[!$prerelease]
+        "name"       = $name
+        "tag"        = $tag
+        "draft"      = @("Y", "N")[!$draft]
+        "prerelease" = @("Y", "N")[!$prerelease]
     }
     RunWorkflow -name $workflowName -parameters $parameters -wait:$wait -branch $branch
 }

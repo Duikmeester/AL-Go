@@ -29,7 +29,7 @@ function GetActionScript {
     $scriptPath = Join-Path $ScriptRoot $scriptName -Resolve
     $actionname = [System.IO.Path]::GetFileNameWithoutExtension($scriptPath)
 
-    $actionScript = Get-Content -raw -path $scriptPath
+    $actionScript = Get-Content -Raw -Path $scriptPath
     $actionScript = "function $actionName {`n$actionScript`n}"
 
     # resolve psscriptroot references
@@ -48,11 +48,11 @@ function YamlTest {
 
     $emptyActionScript = "function emptyAction {`n[CmdletBinding()]`nParam()`n}`n"
     Invoke-Expression $emptyActionScript
-    $emptyCmd = get-command emptyAction
+    $emptyCmd = Get-Command emptyAction
     $systemParameters = @($emptyCmd.Parameters.Keys.GetEnumerator() | ForEach-Object { $_ })
 
     Invoke-Expression $actionScript
-    
+
     $yaml = [System.Text.StringBuilder]::new()
     $yaml.AppendLine("name: *") | Out-Null
     $yaml.AppendLine("author: *") | Out-Null
@@ -62,7 +62,7 @@ function YamlTest {
             $yaml.AppendLine("  $($_): $($permissions."$_")") | Out-Null
         }
     }
-    $cmd = get-command $actionname
+    $cmd = Get-Command $actionname
     $addInputs = $true
     $parameterString = ""
     if ($cmd.Parameters.Count -gt 0) {
@@ -78,7 +78,7 @@ function YamlTest {
                 if ($addInputs) {
                     $yaml.AppendLine("inputs:") | Out-Null
                     $addInputs = $false
-                }    
+                }
                 $yaml.AppendLine("  $($name):") | Out-Null
                 $yaml.AppendLine("    description: $description") | Out-Null
                 $yaml.AppendLine("    required: $($required.ToString().ToLowerInvariant())") | Out-Null
@@ -119,9 +119,9 @@ function YamlTest {
     $yaml.AppendLine("branding:") | Out-Null
     $yaml.AppendLine("  icon: terminal") | Out-Null
     $yaml.Append("  color: blue") | Out-Null
-    
-    $yamlLines = $yaml.ToString().Replace("`r","").Split("`n")
-    $actualYaml = @(Get-Content -path (Join-Path $scriptRoot "action.yaml"))
+
+    $yamlLines = $yaml.ToString().Replace("`r", "").Split("`n")
+    $actualYaml = @(Get-Content -Path (Join-Path $scriptRoot "action.yaml"))
 
     $i = 0
     while ($i -lt $yamlLines.Count -and $i -lt $actualYaml.count) {

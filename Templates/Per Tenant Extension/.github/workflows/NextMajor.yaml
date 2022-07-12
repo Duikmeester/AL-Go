@@ -12,7 +12,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [ windows-latest ]
+    runs-on: [windows-latest]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
       settings: ${{ steps.ReadSettings.outputs.SettingsJson }}
@@ -27,7 +27,7 @@ jobs:
         id: init
         uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
         with:
-          eventId: "DO0099"
+          eventId: 'DO0099'
 
       - name: Read settings
         id: ReadSettings
@@ -37,7 +37,7 @@ jobs:
           getProjects: 'Y'
 
   Build:
-    needs: [ Initialization ]
+    needs: [Initialization]
     runs-on: ${{ fromJson(needs.Initialization.outputs.githubRunner) }}
     strategy:
       matrix:
@@ -122,8 +122,8 @@ jobs:
 
   PostProcess:
     if: always()
-    runs-on: [ windows-latest ]
-    needs: [ Initialization, Build ]
+    runs-on: [windows-latest]
+    needs: [Initialization, Build]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -132,6 +132,5 @@ jobs:
         id: PostProcess
         uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
         with:
-          eventId: "DO0099"
+          eventId: 'DO0099'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
-

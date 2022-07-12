@@ -18,8 +18,8 @@ Describe "WorkflowInitialize Action Tests" {
         $permissions = [ordered]@{
         }
         $outputs = [ordered]@{
-          "correlationId" = "A correlation Id for the workflow"
-          "telemetryScopeJson" = "A telemetryScope that covers the workflow"
+            "correlationI   d  " = "A correlation Id for the workflow"
+            "telemetryScopeJson" = "A telemetryScope that covers the workflow"
         }
         YamlTest -scriptRoot $scriptRoot -actionName $actionName -actionScript $actionScript -permissions $permissions -outputs $outputs
     }

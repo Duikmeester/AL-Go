@@ -38,7 +38,7 @@ function ConvertTo-HashTable() {
     )
     $ht = @{}
     if ($object) {
-        $object.PSObject.Properties | Foreach { $ht[$_.Name] = $_.Value }
+        $object.PSObject.Properties | foreach { $ht[$_.Name] = $_.Value }
     }
     $ht
 }
@@ -96,19 +96,19 @@ function RunWorkflow {
         Write-Host ($parameters | ConvertTo-Json)
     }
 
-    $headers = @{ 
-      "Accept" = "application/vnd.github.v3+json"
-      "Authorization" = "token $token"
+    $headers = @{
+        "Accept"        = "application/vnd.github.v3+json"
+        "Authorization" = "token $token"
     }
 
     $rate = ((InvokeWebRequest -Headers $headers -Uri "https://api.github.com/rate_limit" -retry).Content | ConvertFrom-Json).rate
-    $percent = [int]($rate.remaining*100/$rate.limit)
+    $percent = [int]($rate.remaining * 100 / $rate.limit)
     Write-Host "$($rate.remaining) API calls remaining out of $($rate.limit) ($percent%)"
     if ($percent -lt 10) {
         $resetTimeStamp = ([datetime] '1970-01-01Z').AddSeconds($rate.reset)
         $waitTime = $resetTimeStamp.Subtract([datetime]::Now)
         Write-Host "Less than 10% API calls left, waiting for $($waitTime.TotalSeconds) seconds for limits to reset."
-        Start-Sleep -seconds $waitTime.TotalSeconds+1
+        Start-Sleep -Seconds $waitTime.TotalSeconds+1
     }
 
     Write-Host "Get Workflows"
@@ -119,11 +119,11 @@ function RunWorkflow {
     Write-Host "Get Previous runs"
     $url = "https://api.github.com/repos/$repository/actions/runs"
     $previousrun = (InvokeWebRequest -Method Get -Headers $headers -Uri $url -retry | ConvertFrom-Json).workflow_runs | Where-Object { $_.workflow_id -eq $workflow.id } | Select-Object -First 1
-    
+
     Write-Host "Run workflow"
     $url = "https://api.github.com/repos/$repository/actions/workflows/$($workflow.id)/dispatches"
     $body = @{
-        "ref" = "refs/heads/$branch"
+        "ref"    = "refs/heads/$branch"
         "inputs" = $parameters
     }
     InvokeWebRequest -Method Post -Headers $headers -Uri $url -Body ($body | ConvertTo-Json) | Out-Null
@@ -148,8 +148,8 @@ function WaitWorkflow {
         [string] $runid
     )
 
-    $headers = @{ 
-        "Accept" = "application/vnd.github.v3+json"
+    $headers = @{
+        "Accept"        = "application/vnd.github.v3+json"
         "Authorization" = "token $token"
     }
 
@@ -202,14 +202,14 @@ function CreateRepository {
         Write-Host -ForegroundColor Yellow "`nCreating public repository $repository (based on $template@$templateBranch)"
         invoke-gh repo create $repository --public --clone
     }
-    Start-Sleep -seconds 10
+    Start-Sleep -Seconds 10
     Set-Location '*'
 
     if ($template) {
         $templateUrl = "$template/archive/refs/heads/$templateBranch.zip"
         $zipFileName = Join-Path $tempPath "$([GUID]::NewGuid().ToString()).zip"
         [System.Net.WebClient]::new().DownloadFile($templateUrl, $zipFileName)
-        
+
         $tempRepoPath = Join-Path $tempPath ([GUID]::NewGuid().ToString())
         Expand-Archive -Path $zipFileName -DestinationPath $tempRepoPath
         Copy-Item (Join-Path (Get-Item "$tempRepoPath\*").FullName '*') -Destination . -Recurse -Force
@@ -230,7 +230,7 @@ function CreateRepository {
         Get-ChildItem -Path '.\.github\workflows\*.yaml' | Where-Object { $_.BaseName -ne "UpdateGitHubGoSystemFiles" } | ForEach-Object {
             Write-Host $_.FullName
             $content = (Get-Content -Path $_.FullName -Encoding UTF8 -Raw -Force).Replace("`r", "").TrimEnd("`n").Replace("`n", "`r`n")
-            $srcPattern = "runs-on: [ windows-latest ]`r`n"
+            $srcPattern = "runs-on: [ self-hosted ]`r`n"
             $replacePattern = "runs-on: [ self-hosted ]`r`n"
             $content = $content.Replace($srcPattern, $replacePattern)
             Set-Content -Path $_.FullName -Encoding UTF8 -Value $content
@@ -245,7 +245,7 @@ function CreateRepository {
         invoke-git remote set-url origin "https://$($githubOwner):$token@github.com/$repository.git"
     }
     invoke-git push --set-upstream origin $branch
-    Start-Sleep -seconds 10
+    Start-Sleep -Seconds 10
 }
 
 function Pull {
@@ -297,7 +297,7 @@ function RemoveRepository {
     }
 
     if ($path) {
-        if (-not $path.StartsWith("$([System.IO.Path]::GetTempPath())",[StringComparison]::InvariantCultureIgnoreCase)) {
+        if (-not $path.StartsWith("$([System.IO.Path]::GetTempPath())", [StringComparison]::InvariantCultureIgnoreCase)) {
             throw "$path is not temppath"
         }
         else {

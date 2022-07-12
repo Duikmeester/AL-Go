@@ -10,7 +10,7 @@ on:
       directCommit:
         description: Direct COMMIT (Y/N)
         required: false
-        default: "N"
+        default: 'N'
 
 defaults:
   run:
@@ -18,7 +18,7 @@ defaults:
 
 jobs:
   Collect:
-    runs-on: [ windows-latest ]
+    runs-on: [windows-latest]
     steps:
       - uses: actions/checkout@v2
 

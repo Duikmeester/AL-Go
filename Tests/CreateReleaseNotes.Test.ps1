@@ -25,7 +25,7 @@ Describe 'CreateReleaseNotes Tests' {
 
     It 'Test action.yaml matches script' {
         $permissions = [ordered]@{
-            "contents" = "write"
+            "contents"      = "write"
             "pull-requests" = "write"
         }
         $outputs = [ordered]@{
@@ -33,36 +33,36 @@ Describe 'CreateReleaseNotes Tests' {
         }
         YamlTest -scriptRoot $scriptRoot -actionName $actionName -actionScript $actionScript -permissions $permissions -outputs $outputs
     }
-    
+
     It 'Confirms that right functions are called' {
-        Mock GetLatestRelease { return "{""tag_name"" : ""1.0.0.0""}" | ConvertFrom-Json } 
-        Mock GetReleaseNotes  {return "{
+        Mock GetLatestRelease { return "{""tag_name"" : ""1.0.0.0""}" | ConvertFrom-Json }
+        Mock GetReleaseNotes { return "{
             ""name"": ""tagname"",
             ""body"": ""Mocked notes""
         }"}
-        Mock DownloadAndImportBcContainerHelper  {}
-        Mock CreateScope  {}
+        Mock DownloadAndImportBcContainerHelper {}
+        Mock CreateScope {}
 
         . $scriptPath -token "" -actor "" -workflowToken "" -tag_name "1.0.5" -parentTelemetryScopeJson "{}"
-    
-        Should -Invoke -CommandName GetLatestRelease -Exactly -Times 1 
+
+        Should -Invoke -CommandName GetLatestRelease -Exactly -Times 1
         Should -Invoke -CommandName GetReleaseNotes -Exactly -Times 1 -ParameterFilter { $tag_name -eq "1.0.5" -and $previous_tag_name -eq "1.0.0.0" }
 
         $releaseNotes | Should -Be "Mocked notes"
     }
 
     It 'Confirm right parameters are passed' {
-        Mock GetLatestRelease { return $null } 
-        Mock GetReleaseNotes  {return "{
+        Mock GetLatestRelease { return $null }
+        Mock GetReleaseNotes { return "{
             ""name"": ""tagname"",
             ""body"": ""Mocked notes""
         }"}
-        Mock DownloadAndImportBcContainerHelper  {}
-        Mock CreateScope  {}
+        Mock DownloadAndImportBcContainerHelper {}
+        Mock CreateScope {}
 
         . $scriptPath -token "" -actor "" -workflowToken "" -tag_name "1.0.5" -parentTelemetryScopeJson "{}"
-    
-        Should -Invoke -CommandName GetLatestRelease -Exactly -Times 1 
+
+        Should -Invoke -CommandName GetLatestRelease -Exactly -Times 1
         Should -Invoke -CommandName GetReleaseNotes -Exactly -Times 1 -ParameterFilter { $tag_name -eq "1.0.5" -and $previous_tag_name -eq "" }
 
         $releaseNotes | Should -Be "Mocked notes"

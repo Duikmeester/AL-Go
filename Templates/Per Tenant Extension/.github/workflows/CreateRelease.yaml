@@ -49,7 +49,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [ windows-latest ]
+    runs-on: [windows-latest]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
@@ -60,11 +60,11 @@ jobs:
         id: init
         uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
         with:
-          eventId: "DO0094"
+          eventId: 'DO0094'
 
   CreateRelease:
-    runs-on: [ windows-latest ]
-    needs: [ Initialization ]
+    runs-on: [windows-latest]
+    needs: [Initialization]
     outputs:
       artifacts: ${{ steps.analyzeartifacts.outputs.artifacts }}
       upload_url: ${{ steps.createrelease.outputs.upload_url }}
@@ -89,7 +89,7 @@ jobs:
         run: |
           Write-Host "Analyzing artifacts"
           $appVersion = '${{ github.event.inputs.appVersion }}'
-          $headers = @{ 
+          $headers = @{
               "Authorization" = "token ${{ github.token }}"
               "Accept"        = "application/json"
           }
@@ -132,8 +132,8 @@ jobs:
           body: ${{ steps.createreleasenotes.outputs.releaseNotes }}
 
   UploadArtifacts:
-    runs-on: [ windows-latest ] 
-    needs: [ CreateRelease ]
+    runs-on: [windows-latest]
+    needs: [CreateRelease]
     strategy:
       matrix: ${{ fromJson(needs.CreateRelease.outputs.artifacts) }}
       fail-fast: true
@@ -155,12 +155,12 @@ jobs:
       - name: Download artifact
         run: |
           Write-Host "Downloading artifact ${{ matrix.name}}"
-          $headers = @{ 
+          $headers = @{
               "Authorization" = "token ${{ github.token }}"
               "Accept"        = "application/vnd.github.v3+json"
           }
           Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri '${{ matrix.url }}' -OutFile '${{ matrix.name }}.zip'
-          
+
       - name: Upload release artifacts
         uses: actions/upload-release-asset@v1
         env:
@@ -238,8 +238,8 @@ jobs:
 
   CreateReleaseBranch:
     if: ${{ github.event.inputs.createReleaseBranch=='Y' }}
-    runs-on: [ windows-latest ]
-    needs: [ Initialization, CreateRelease, UploadArtifacts ]
+    runs-on: [windows-latest]
+    needs: [Initialization, CreateRelease, UploadArtifacts]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -254,8 +254,8 @@ jobs:
 
   UpdateVersionNumber:
     if: ${{ github.event.inputs.updateVersionNumber!='' }}
-    runs-on: [ windows-latest ]
-    needs: [ Initialization, CreateRelease, UploadArtifacts ]
+    runs-on: [windows-latest]
+    needs: [Initialization, CreateRelease, UploadArtifacts]
     steps:
       - name: Update Version Number
         uses: microsoft/AL-Go-Actions/IncrementVersionNumber@main
@@ -266,8 +266,15 @@ jobs:
 
   PostProcess:
     if: always()
-    runs-on: [ windows-latest ]
-    needs: [ Initialization, CreateRelease, UploadArtifacts, CreateReleaseBranch, UpdateVersionNumber ]
+    runs-on: [windows-latest]
+    needs:
+      [
+        Initialization,
+        CreateRelease,
+        UploadArtifacts,
+        CreateReleaseBranch,
+        UpdateVersionNumber,
+      ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -276,5 +283,5 @@ jobs:
         id: PostProcess
         uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
         with:
-          eventId: "DO0094"
+          eventId: 'DO0094'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}

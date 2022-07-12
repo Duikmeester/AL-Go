@@ -30,9 +30,9 @@ try {
     }
 
     $originalOwnerAndRepo = @{
-        "actionsRepo" = "microsoft/AL-Go-Actions"
+        "actionsRepo"            = "microsoft/AL-Go-Actions"
         "perTenantExtensionRepo" = "microsoft/AL-Go-PTE"
-        "appSourceAppRepo" = "microsoft/AL-Go-AppSource"
+        "appSourceAppRepo"       = "microsoft/AL-Go-AppSource"
     }
     $originalBranch = "main"
 
@@ -66,14 +66,15 @@ try {
     }
 
     $srcUrl = invoke-git -returnValue config --get remote.origin.url
-    if ($srcUrl.EndsWith('.git')) { $srcUrl = $srcUrl.Substring(0,$srcUrl.Length-4) }
+    if ($srcUrl.EndsWith('.git')) { $srcUrl = $srcUrl.Substring(0, $srcUrl.Length - 4) }
     $uri = [Uri]::new($srcUrl)
     $srcOwnerAndRepo = $uri.LocalPath.Trim('/')
     Write-Host "Source Owner+Repo: $srcOwnerAndRepo"
 
     if (($config.PSObject.Properties.Name -eq "baseFolder") -and ($config.baseFolder)) {
-        $baseFolder =  Join-Path $config.baseFolder $config.localFolder 
-    }else {
+        $baseFolder = Join-Path $config.baseFolder $config.localFolder
+    }
+    else {
         $baseFolder = Join-Path ([Environment]::GetFolderPath("MyDocuments")) $config.localFolder
     }
 
@@ -158,9 +159,9 @@ try {
     }
 
     $repos = @(
-        @{ "repo" = $config.actionsRepo;            "srcPath" = Join-Path $baseRepoPath "Actions";                        "dstPath" = $actionsRepoPath;            "branch" = $config.branch }
+        @{ "repo" = $config.actionsRepo; "srcPath" = Join-Path $baseRepoPath "Actions"; "dstPath" = $actionsRepoPath; "branch" = $config.branch }
         @{ "repo" = $config.perTenantExtensionRepo; "srcPath" = Join-Path $baseRepoPath "Templates\Per Tenant Extension"; "dstPath" = $perTenantExtensionRepoPath; "branch" = $config.branch }
-        @{ "repo" = $config.appSourceAppRepo;       "srcPath" = Join-Path $baseRepoPath "Templates\AppSource App";        "dstPath" = $appSourceAppRepoPath;       "branch" = $config.branch }
+        @{ "repo" = $config.appSourceAppRepo; "srcPath" = Join-Path $baseRepoPath "Templates\AppSource App"; "dstPath" = $appSourceAppRepoPath; "branch" = $config.branch }
     )
 
     if ($collect) {
@@ -175,7 +176,7 @@ try {
             $repo = $_.repo
             $srcPath = $_.srcPath
             $dstPath = $_.dstPath
-        
+
             Write-Host -ForegroundColor Yellow "Collecting from $repo"
 
             Get-ChildItem -Path "$srcPath\*" | Where-Object { !($_.PSIsContainer -and $_.Name -eq ".git") } | ForEach-Object {
@@ -195,8 +196,8 @@ try {
                     New-Item $srcFilePath -ItemType Directory | Out-Null
                 }
                 Write-Host "$dstFile -> $srcFile"
-                $lines = ([string](Get-Content -Raw -path $dstFile)).Split("`n")
-                "actionsRepo","perTenantExtensionRepo","appSourceAppRepo" | ForEach-Object {
+                $lines = ([string](Get-Content -Raw -Path $dstFile)).Split("`n")
+                "actionsRepo", "perTenantExtensionRepo", "appSourceAppRepo" | ForEach-Object {
                     $regex = "^(.*)$($config.githubOwner)/$($config."$_")(.*)$($config.branch)(.*)$"
                     $replace = "`$1$($originalOwnerAndRepo."$_")`$2$originalBranch`$3"
                     $lines = $lines | ForEach-Object { $_ -replace $regex, $replace }
@@ -231,11 +232,11 @@ try {
             Write-Host "Copy template repositories to main branch"
             $additionalRepos = @(
                 @{ "repo" = $config.perTenantExtensionRepo; "srcPath" = Join-Path $baseRepoPath "Templates\Per Tenant Extension"; "dstPath" = $perTenantExtensionRepoPath; "branch" = "main" }
-                @{ "repo" = $config.appSourceAppRepo;       "srcPath" = Join-Path $baseRepoPath "Templates\AppSource App";        "dstPath" = $appSourceAppRepoPath;       "branch" = "main" }
-                @{ "repo" = $config.actionsRepo;            "srcPath" = Join-Path $baseRepoPath "Actions";                        "dstPath" = $actionsRepoPath;            "branch" = "main" }
+                @{ "repo" = $config.appSourceAppRepo; "srcPath" = Join-Path $baseRepoPath "Templates\AppSource App"; "dstPath" = $appSourceAppRepoPath; "branch" = "main" }
+                @{ "repo" = $config.actionsRepo; "srcPath" = Join-Path $baseRepoPath "Actions"; "dstPath" = $actionsRepoPath; "branch" = "main" }
                 @{ "repo" = $config.perTenantExtensionRepo; "srcPath" = Join-Path $baseRepoPath "Templates\Per Tenant Extension"; "dstPath" = $perTenantExtensionRepoPath; "branch" = "preview" }
-                @{ "repo" = $config.appSourceAppRepo;       "srcPath" = Join-Path $baseRepoPath "Templates\AppSource App";        "dstPath" = $appSourceAppRepoPath;       "branch" = "preview" }
-                @{ "repo" = $config.actionsRepo;            "srcPath" = Join-Path $baseRepoPath "Actions";                        "dstPath" = $actionsRepoPath;            "branch" = "preview" }
+                @{ "repo" = $config.appSourceAppRepo; "srcPath" = Join-Path $baseRepoPath "Templates\AppSource App"; "dstPath" = $appSourceAppRepoPath; "branch" = "preview" }
+                @{ "repo" = $config.actionsRepo; "srcPath" = Join-Path $baseRepoPath "Actions"; "dstPath" = $actionsRepoPath; "branch" = "preview" }
             )
         }
 
@@ -288,7 +289,7 @@ try {
                 }
                 invoke-git push -u origin $branch
             }
-        
+
             Get-ChildItem "$srcPath\*" -Recurse | Where-Object { !$_.PSIsContainer } | ForEach-Object {
                 $srcFile = $_.FullName
                 $dstFile = $dstPath + $srcFile.Substring($srcPath.Length)
@@ -300,8 +301,8 @@ try {
                 if ($_.Name -eq "AL-Go-Settings.json") {
                     $useBranch = $branch
                 }
-                $lines = ([string](Get-Content -Raw -path $srcFile)).Split("`n")
-                "actionsRepo","perTenantExtensionRepo","appSourceAppRepo" | ForEach-Object {
+                $lines = ([string](Get-Content -Raw -Path $srcFile)).Split("`n")
+                "actionsRepo", "perTenantExtensionRepo", "appSourceAppRepo" | ForEach-Object {
                     $regex = "^(.*)$($originalOwnerAndRepo."$_")(.*)$originalBranch(.*)$"
                     $replace = "`$1$($config.githubOwner)/$($config."$_")`$2$($useBranch)`$3"
                     $lines = $lines | ForEach-Object { $_ -replace $regex, $replace }
@@ -311,7 +312,7 @@ try {
             if (Test-Path -Path '.\.github' -PathType Container) {
                 Copy-Item -Path (Join-Path $baseRepoPath "RELEASENOTES.md") -Destination ".\.github\RELEASENOTES.copy.md" -Force
             }
-            
+
             invoke-git add .
             invoke-git commit --allow-empty -m 'checkout'
             invoke-git push $serverUrl
@@ -319,5 +320,5 @@ try {
     }
 }
 finally {
-    set-location $oldPath
+    Set-Location $oldPath
 }

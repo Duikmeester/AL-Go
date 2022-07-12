@@ -192,7 +192,7 @@ After opening the repository, VS Code asks whether you want to open the workspac
 ![](Docs/image-9.png)
 ![](Docs/image-8.png)
 
-And you should “almost” be ready to start working:  
+And you should “almost” be ready to start working:
 ![](Docs/image-10.png)
 
 ### Make it your project

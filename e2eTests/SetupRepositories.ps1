@@ -14,13 +14,13 @@ $appSourceAppRepo = "$repoBaseName-AppSource"
 [System.IO.Path]::GetTempPath()
 
 $settings = [ordered]@{
-    "githubOwner" = $githubOwner
-    "actionsRepo" = $actionsRepo
+    "githubOwner"            = $githubOwner
+    "actionsRepo"            = $actionsRepo
     "perTenantExtensionRepo" = $perTenantExtensionRepo
-    "appSourceAppRepo" = $appSourceAppRepo
-    "branch" = "main"
-    "localFolder" = ""
-    "baseFolder" = [System.IO.Path]::GetTempPath()
+    "appSourceAppRepo"       = $appSourceAppRepo
+    "branch"                 = "main"
+    "localFolder"            = ""
+    "baseFolder"             = [System.IO.Path]::GetTempPath()
 }
 
 $settingsFile = Join-Path $settings.baseFolder "$repoBaseName.json"

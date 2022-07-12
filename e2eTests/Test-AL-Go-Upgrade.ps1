@@ -10,14 +10,14 @@
     [switch] $private
 )
 
-#  ______           _ ___                _    _    _                           _         _           _                                    _       
-# |  ____|         | |__ \              | |  | |  | |                         | |       | |         | |                                  (_)      
-# | |__   _ __   __| |  ) |___ _ __   __| |  | |  | |_ __   __ _ _ __ __ _  __| | ___   | |_ ___ ___| |_    ___  ___ ___ _ __   __ _ _ __ _  ___  
-# |  __| | '_ \ / _` | / // _ \ '_ \ / _` |  | |  | | '_ \ / _` | '__/ _` |/ _` |/ _ \  | __/ _ \ __| __|  / __|/ __/ _ \ '_ \ / _` | '__| |/ _ \ 
+#  ______           _ ___                _    _    _                           _         _           _                                    _
+# |  ____|         | |__ \              | |  | |  | |                         | |       | |         | |                                  (_)
+# | |__   _ __   __| |  ) |___ _ __   __| |  | |  | |_ __   __ _ _ __ __ _  __| | ___   | |_ ___ ___| |_    ___  ___ ___ _ __   __ _ _ __ _  ___
+# |  __| | '_ \ / _` | / // _ \ '_ \ / _` |  | |  | | '_ \ / _` | '__/ _` |/ _` |/ _ \  | __/ _ \ __| __|  / __|/ __/ _ \ '_ \ / _` | '__| |/ _ \
 # | |____| | | | (_| |/ /_  __/ | | | (_| |  | |__| | |_) | (_| | | | (_| | (_| |  __/  | |_  __\__ \ |_   \__ \ (__  __/ | | | (_| | |  | | (_) |
-# |______|_| |_|\__,_|____\___|_| |_|\__,_|   \____/| .__/ \__, |_|  \__,_|\__,_|\___|   \__\___|___/\__|  |___/\___\___|_| |_|\__,_|_|  |_|\___/ 
-#                                                   | |     __/ |                                                                                 
-#                                                   |_|    |___/                                                                                  
+# |______|_| |_|\__,_|____\___|_| |_|\__,_|   \____/| .__/ \__, |_|  \__,_|\__,_|\___|   \__\___|___/\__|  |___/\___\___|_| |_|\__,_|_|  |_|\___/
+#                                                   | |     __/ |
+#                                                   |_|    |___/
 #
 # This scenario runs for every previously released version of GitHub Go - both for PTEs and AppSource Apps
 # The scenario tests that we do not break existing CI/CD workflows and that existing repositories can upgrade to newest version
@@ -44,7 +44,7 @@ try {
     Import-Module (Join-Path $PSScriptRoot "e2eTestHelper.psm1") -DisableNameChecking
 
     if (!$github) {
-        if (!$token) {  $token = (Get-AzKeyVaultSecret -VaultName "BuildVariables" -Name "OrgPAT").SecretValue | Get-PlainText }
+        if (!$token) { $token = (Get-AzKeyVaultSecret -VaultName "BuildVariables" -Name "OrgPAT").SecretValue | Get-PlainText }
         $githubOwner = "freddydk"
         if (!$licenseFileUrl -and $appSourceApp) { $licenseFileUrl = (Get-AzKeyVaultSecret -VaultName "BuildVariables" -Name "licenseFile").SecretValue | Get-PlainText }
         $release = "v0.1"
@@ -91,7 +91,7 @@ try {
         $settings.AppSourceCopMandatoryAffixes = @("cust")
     }
     $settings | ConvertTo-Json | Set-Content $settingsFile -Encoding UTF8
-    Add-Content -path (Join-Path $repoPath '.AL-Go\localdevenv.ps1') -Encoding UTF8 -Value "`n`n# Dummy comment" |
+    Add-Content -Path (Join-Path $repoPath '.AL-Go\localdevenv.ps1') -Encoding UTF8 -Value "`n`n# Dummy comment" |
     CommitAndPush -commitMessage "Update settings.json"
     $runs++
 
@@ -116,9 +116,9 @@ try {
     $run = Run-CICD -wait -branch $branch
     $runs++
     Test-ArtifactsFromRun -runid $run.id -expectedNumberOfApps 1 -expectedNumberOfTestApps 1 -expectedNumberOfTests 1 -folder 'artifacts2' -repoVersion '1.0.' -appVersion ''
-    
+
     Test-NumberOfRuns -expectedNumberOfRuns $runs
-    
+
     RemoveRepository -repository $repository -path $repoPath
 }
 catch {

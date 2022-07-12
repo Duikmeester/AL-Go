@@ -72,7 +72,7 @@ Note that when using the preview version of AL-Go for GitHub, you need to Update
 ```
     "ConditionalSettings": [
         {
-            "branches": [ 
+            "branches": [
                 "feature/*"
             ],
             "settings": {

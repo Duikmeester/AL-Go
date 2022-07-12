@@ -25,7 +25,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [ windows-latest ]
+    runs-on: [windows-latest]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
@@ -36,11 +36,11 @@ jobs:
         id: init
         uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
         with:
-          eventId: "DO0093"
+          eventId: 'DO0093'
 
   CreateEnvironment:
-    runs-on: [ windows-latest ]
-    needs: [ Initialization ]
+    runs-on: [windows-latest]
+    needs: [Initialization]
 
     steps:
       - name: Checkout
@@ -83,15 +83,15 @@ jobs:
         uses: microsoft/AL-Go-Actions/CreateDevelopmentEnvironment@main
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
-          environmentName: ${{ github.event.inputs.environmentName }} 
-          reUseExistingEnvironment: ${{ github.event.inputs.reUseExistingEnvironment }} 
-          directCommit: ${{ github.event.inputs.directCommit }} 
-          adminCenterApiCredentials: ${{ env.adminCenterApiCredentials }} 
+          environmentName: ${{ github.event.inputs.environmentName }}
+          reUseExistingEnvironment: ${{ github.event.inputs.reUseExistingEnvironment }}
+          directCommit: ${{ github.event.inputs.directCommit }}
+          adminCenterApiCredentials: ${{ env.adminCenterApiCredentials }}
 
   PostProcess:
     if: always()
-    runs-on: [ windows-latest ]
-    needs: [ Initialization,  CreateEnvironment ]
+    runs-on: [windows-latest]
+    needs: [Initialization, CreateEnvironment]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -100,5 +100,5 @@ jobs:
         id: PostProcess
         uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
         with:
-          eventId: "DO0093"
+          eventId: 'DO0093'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}

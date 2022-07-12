@@ -9,7 +9,7 @@ on:
         default: '.'
       name:
         description: Name
-        required: true      
+        required: true
       publisher:
         description: Publisher
         required: true
@@ -23,7 +23,7 @@ on:
       directCommit:
         description: Direct COMMIT (Y/N)
         required: false
-        default: "N"
+        default: 'N'
 
 permissions:
   contents: write
@@ -35,7 +35,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [ windows-latest ]
+    runs-on: [windows-latest]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
@@ -46,11 +46,11 @@ jobs:
         id: init
         uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
         with:
-          eventId: "DO0092"
+          eventId: 'DO0092'
 
   CreateApp:
-    runs-on: [ windows-latest ]
-    needs: [ Initialization ]
+    runs-on: [windows-latest]
+    needs: [Initialization]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -75,8 +75,8 @@ jobs:
 
   PostProcess:
     if: always()
-    runs-on: [ windows-latest ]
-    needs: [ Initialization, CreateApp ]
+    runs-on: [windows-latest]
+    needs: [Initialization, CreateApp]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -85,5 +85,5 @@ jobs:
         id: PostProcess
         uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
         with:
-          eventId: "DO0092"
+          eventId: 'DO0092'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}

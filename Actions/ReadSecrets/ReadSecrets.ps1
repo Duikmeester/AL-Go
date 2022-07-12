@@ -1,5 +1,4 @@
 Param(
-
     [Parameter(HelpMessage = "Settings from template repository in compressed Json format", Mandatory = $false)]
     [string] $settingsJson = '{"keyVaultName": ""}',
     [Parameter(HelpMessage = "Comma separated list of Secrets to get", Mandatory = $true)]
@@ -20,7 +19,7 @@ try {
     . (Join-Path -Path $PSScriptRoot -ChildPath "..\AL-Go-Helper.ps1" -Resolve)
     $BcContainerHelperPath = DownloadAndImportBcContainerHelper -baseFolder $ENV:GITHUB_WORKSPACE
 
-    import-module (Join-Path -path $PSScriptRoot -ChildPath "..\TelemetryHelper.psm1" -Resolve)
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "..\TelemetryHelper.psm1" -Resolve)
     $telemetryScope = CreateScope -eventId 'DO0078' -parentTelemetryScopeJson $parentTelemetryScopeJson
 
     try {
@@ -31,7 +30,7 @@ try {
         }
     }
     catch [System.Threading.AbandonedMutexException] {
-       Write-Host "Other process terminated abnormally"
+        Write-Host "Other process terminated abnormally"
     }
 
     Import-Module (Join-Path $PSScriptRoot ".\ReadSecretsHelper.psm1")
@@ -81,12 +80,12 @@ try {
         $outSettings.appDependencyProbingPaths | ForEach-Object {
             if ($_.PsObject.Properties.name -eq "AuthTokenSecret") {
                 $_.authTokenSecret = GetSecret -secret $_.authTokenSecret -keyVaultName $keyVaultName
-            } 
+            }
         }
     }
 
     if ($secretsCollection) {
-        Write-Host "The following secrets was not found: $(($secretsCollection | ForEach-Object { 
+        Write-Host "The following secrets was not found: $(($secretsCollection | ForEach-Object {
             $secretSplit = @($_.Split('='))
             if ($secretSplit.Count -eq 1) {
                 $secretSplit[0]
@@ -114,4 +113,5 @@ catch {
 finally {
     CleanupAfterBcContainerHelper -bcContainerHelperPath $bcContainerHelperPath
     $buildMutex.ReleaseMutex()
+}
 }

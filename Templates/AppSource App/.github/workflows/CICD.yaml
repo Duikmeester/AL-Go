@@ -6,12 +6,12 @@ on:
     paths-ignore:
       - 'README.md'
       - '.github/**'
-    branches: [ 'main', 'release/*', 'feature/*' ]
+    branches: ['main', 'release/*', 'feature/*']
   pull_request:
     paths-ignore:
       - 'README.md'
       - '.github/**'
-    branches: [ 'main' ]
+    branches: ['main']
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [ windows-latest ]
+    runs-on: [windows-latest]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
       settings: ${{ steps.ReadSettings.outputs.SettingsJson }}
@@ -39,7 +39,7 @@ jobs:
         id: init
         uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
         with:
-          eventId: "DO0091"
+          eventId: 'DO0091'
 
       - name: Read settings
         id: ReadSettings
@@ -50,8 +50,8 @@ jobs:
           getEnvironments: '*'
 
   CheckForUpdates:
-    runs-on: [ windows-latest ]
-    needs: [ Initialization ]
+    runs-on: [windows-latest]
+    needs: [Initialization]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -69,7 +69,7 @@ jobs:
           templateUrl: ${{ env.TemplateUrl }}
 
   Build:
-    needs: [ Initialization ]
+    needs: [Initialization]
     runs-on: ${{ fromJson(needs.Initialization.outputs.githubRunner) }}
     strategy:
       matrix:
@@ -190,7 +190,7 @@ jobs:
           Project: ${{ matrix.project }}
 
   Deploy:
-    needs: [ Initialization, Build ]
+    needs: [Initialization, Build]
     if: ${{ github.event_name != 'pull_request' && github.ref_name == 'main' && needs.Initialization.outputs.environmentCount > 0 }}
     strategy: ${{ fromJson(needs.Initialization.outputs.environments) }}
     runs-on: ${{ matrix.os }}
@@ -234,7 +234,7 @@ jobs:
               if ($authContext) {
                 Write-Host "Using $_ secret"
               }
-            }            
+            }
           }
           if (!($authContext)) {
             Write-Host "::Error::No AuthContext provided"
@@ -247,7 +247,7 @@ jobs:
               if ($EnvironmentName) {
                 Write-Host "Using $_ secret"
               }
-            }            
+            }
           }
           if (!($environmentName)) {
             $environmentName = '${{ steps.envName.outputs.envName }}'
@@ -270,8 +270,8 @@ jobs:
 
   PostProcess:
     if: always()
-    runs-on: [ windows-latest ]
-    needs: [ Initialization,  Build, Deploy ]
+    runs-on: [windows-latest]
+    needs: [Initialization, Build, Deploy]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -280,5 +280,5 @@ jobs:
         id: PostProcess
         uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
         with:
-          eventId: "DO0091"
+          eventId: 'DO0091'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}

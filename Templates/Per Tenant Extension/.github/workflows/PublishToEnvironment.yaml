@@ -21,7 +21,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [ windows-latest ]
+    runs-on: [windows-latest]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
@@ -32,11 +32,11 @@ jobs:
         id: init
         uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
         with:
-          eventId: "DO0097"
+          eventId: 'DO0097'
 
   Analyze:
-    runs-on: [ windows-latest ]
-    needs: [ Initialization ]
+    runs-on: [windows-latest]
+    needs: [Initialization]
     outputs:
       settings: ${{ steps.ReadSettings.outputs.SettingsJson }}
       environments: ${{ steps.ReadSettings.outputs.EnvironmentsJson }}
@@ -54,7 +54,7 @@ jobs:
           includeProduction: 'Y'
 
   Deploy:
-    needs: [ Analyze ]
+    needs: [Analyze]
     if: ${{ needs.Analyze.outputs.environmentCount > 0 }}
     strategy: ${{ fromJson(needs.Initialization.outputs.environments) }}
     runs-on: ${{ matrix.os }}
@@ -93,7 +93,7 @@ jobs:
               if ($authContext) {
                 Write-Host "Using $_ secret"
               }
-            }            
+            }
           }
           if (!($authContext)) {
             Write-Host "::Error::No AuthContext provided"
@@ -106,7 +106,7 @@ jobs:
               if ($EnvironmentName) {
                 Write-Host "Using $_ secret"
               }
-            }            
+            }
           }
           if (!($environmentName)) {
             $environmentName = '${{ steps.envName.outputs.envName }}'
@@ -130,8 +130,8 @@ jobs:
 
   PostProcess:
     if: always()
-    runs-on: [ windows-latest ]
-    needs: [ Initialization, Analyze, Deploy ]
+    runs-on: [windows-latest]
+    needs: [Initialization, Analyze, Deploy]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -140,5 +140,5 @@ jobs:
         id: PostProcess
         uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
         with:
-          eventId: "DO0097"
+          eventId: 'DO0097'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}

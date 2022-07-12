@@ -18,10 +18,10 @@ Describe "ReadSettings Action Tests" {
         $permissions = [ordered]@{
         }
         $outputs = [ordered]@{
-            "SettingsJson" = "Settings in compressed Json format"
+            "SettingsJson"     = "Settings in compressed Json format"
             "GitHubRunnerJson" = "GitHubRunner in compressed Json format"
-            "ProjectsJson" = "Projects in compressed Json format"
-            "ProjectCount" = "Number of projects in array"
+            "ProjectsJson"     = "Projects in compressed Json format"
+            "ProjectCount"     = "Number of projects in array"
             "EnvironmentsJson" = "Environments in compressed Json format"
             "EnvironmentCount" = "Number of environments in array"
         }
