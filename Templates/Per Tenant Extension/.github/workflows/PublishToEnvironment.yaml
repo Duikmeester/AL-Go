@@ -21,7 +21,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
@@ -30,12 +30,12 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
+        uses: Duikmeester/AL-Go-Actions/WorkflowInitialize@hosted
         with:
           eventId: 'DO0097'
 
   Analyze:
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [Initialization]
     outputs:
       settings: ${{ steps.ReadSettings.outputs.SettingsJson }}
@@ -47,7 +47,7 @@ jobs:
 
       - name: Read settings
         id: ReadSettings
-        uses: microsoft/AL-Go-Actions/ReadSettings@main
+        uses: Duikmeester/AL-Go-Actions/ReadSettings@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           getEnvironments: '${{ github.event.inputs.environmentName }}'
@@ -72,10 +72,10 @@ jobs:
           Write-Host "::set-output name=envName::$envName"
 
       - name: Read settings
-        uses: microsoft/AL-Go-Actions/ReadSettings@main
+        uses: Duikmeester/AL-Go-Actions/ReadSettings@hosted
 
       - name: Read secrets
-        uses: microsoft/AL-Go-Actions/ReadSecrets@main
+        uses: Duikmeester/AL-Go-Actions/ReadSecrets@hosted
         env:
           secrets: ${{ toJson(secrets) }}
         with:
@@ -118,7 +118,7 @@ jobs:
           Write-Host "set-output name=environmentName::$environmentName"
 
       - name: Deploy
-        uses: microsoft/AL-Go-Actions/Deploy@main
+        uses: Duikmeester/AL-Go-Actions/Deploy@hosted
         env:
           authContext: '${{ steps.authContext.outputs.authContext }}'
         with:
@@ -130,7 +130,7 @@ jobs:
 
   PostProcess:
     if: always()
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [Initialization, Analyze, Deploy]
     steps:
       - name: Checkout
@@ -138,7 +138,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
+        uses: Duikmeester/AL-Go-Actions/WorkflowPostProcess@hosted
         with:
           eventId: 'DO0097'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}

@@ -49,7 +49,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
@@ -58,12 +58,12 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
+        uses: Duikmeester/AL-Go-Actions/WorkflowInitialize@hosted
         with:
           eventId: 'DO0094'
 
   CreateRelease:
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [Initialization]
     outputs:
       artifacts: ${{ steps.analyzeartifacts.outputs.artifacts }}
@@ -73,13 +73,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Read settings
-        uses: microsoft/AL-Go-Actions/ReadSettings@main
+        uses: Duikmeester/AL-Go-Actions/ReadSettings@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           get: TemplateUrl
 
       - name: Check for updates to AL-Go system files
-        uses: microsoft/AL-Go-Actions/CheckForUpdates@main
+        uses: Duikmeester/AL-Go-Actions/CheckForUpdates@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           templateUrl: ${{ env.TemplateUrl }}
@@ -114,7 +114,7 @@ jobs:
 
       - name: Prepare release notes
         id: createreleasenotes
-        uses: microsoft/AL-Go-Actions/CreateReleaseNotes@main
+        uses: Duikmeester/AL-Go-Actions/CreateReleaseNotes@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           tag_name: '${{github.event.inputs.tag}}'
@@ -132,19 +132,19 @@ jobs:
           body: ${{ steps.createreleasenotes.outputs.releaseNotes }}
 
   UploadArtifacts:
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [CreateRelease]
     strategy:
       matrix: ${{ fromJson(needs.CreateRelease.outputs.artifacts) }}
       fail-fast: true
     steps:
       - name: Read settings
-        uses: microsoft/AL-Go-Actions/ReadSettings@main
+        uses: Duikmeester/AL-Go-Actions/ReadSettings@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
 
       - name: Read secrets
-        uses: microsoft/AL-Go-Actions/ReadSecrets@main
+        uses: Duikmeester/AL-Go-Actions/ReadSecrets@hosted
         env:
           secrets: ${{ toJson(secrets) }}
         with:
@@ -238,7 +238,7 @@ jobs:
 
   CreateReleaseBranch:
     if: ${{ github.event.inputs.createReleaseBranch=='Y' }}
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [Initialization, CreateRelease, UploadArtifacts]
     steps:
       - name: Checkout
@@ -254,11 +254,11 @@ jobs:
 
   UpdateVersionNumber:
     if: ${{ github.event.inputs.updateVersionNumber!='' }}
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [Initialization, CreateRelease, UploadArtifacts]
     steps:
       - name: Update Version Number
-        uses: microsoft/AL-Go-Actions/IncrementVersionNumber@main
+        uses: Duikmeester/AL-Go-Actions/IncrementVersionNumber@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           versionNumber: ${{ github.event.inputs.updateVersionNumber }}
@@ -266,7 +266,7 @@ jobs:
 
   PostProcess:
     if: always()
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs:
       [
         Initialization,
@@ -281,7 +281,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
+        uses: Duikmeester/AL-Go-Actions/WorkflowPostProcess@hosted
         with:
           eventId: 'DO0094'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}

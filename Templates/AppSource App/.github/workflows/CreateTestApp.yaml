@@ -37,7 +37,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
@@ -46,17 +46,17 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
+        uses: Duikmeester/AL-Go-Actions/WorkflowInitialize@hosted
         with:
           eventId: 'DO0095'
 
   Update:
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [Initialization]
 
     steps:
       - name: Creating a new test app
-        uses: microsoft/AL-Go-Actions/CreateApp@main
+        uses: Duikmeester/AL-Go-Actions/CreateApp@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           project: ${{ github.event.inputs.project }}
@@ -69,7 +69,7 @@ jobs:
 
   PostProcess:
     if: always()
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [Initialization, Update]
     steps:
       - name: Checkout
@@ -77,7 +77,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
+        uses: Duikmeester/AL-Go-Actions/WorkflowPostProcess@hosted
         with:
           eventId: 'DO0095'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}

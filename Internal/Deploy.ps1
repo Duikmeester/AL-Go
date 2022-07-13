@@ -30,9 +30,9 @@ try {
     }
 
     $originalOwnerAndRepo = @{
-        "actionsRepo"            = "microsoft/AL-Go-Actions"
-        "perTenantExtensionRepo" = "microsoft/AL-Go-PTE"
-        "appSourceAppRepo"       = "microsoft/AL-Go-AppSource"
+        "actionsRepo"            = "Duikmeester/AL-Go-Actions"
+        "perTenantExtensionRepo" = "Duikmeester/AL-Go-PTE"
+        "appSourceAppRepo"       = "Duikmeester/AL-Go-AppSource"
     }
     $originalBranch = "main"
 

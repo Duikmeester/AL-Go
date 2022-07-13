@@ -22,7 +22,7 @@ defaults:
 
 jobs:
   Initialization:
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     outputs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
       settings: ${{ steps.ReadSettings.outputs.SettingsJson }}
@@ -37,33 +37,33 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: microsoft/AL-Go-Actions/WorkflowInitialize@main
+        uses: Duikmeester/AL-Go-Actions/WorkflowInitialize@hosted
         with:
           eventId: 'DO0091'
 
       - name: Read settings
         id: ReadSettings
-        uses: microsoft/AL-Go-Actions/ReadSettings@main
+        uses: Duikmeester/AL-Go-Actions/ReadSettings@hosted
         with:
           parentTelemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
           getProjects: 'Y'
           getEnvironments: '*'
 
   CheckForUpdates:
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [Initialization]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Read settings
-        uses: microsoft/AL-Go-Actions/ReadSettings@main
+        uses: Duikmeester/AL-Go-Actions/ReadSettings@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           get: TemplateUrl
 
       - name: Check for updates to AL-Go system files
-        uses: microsoft/AL-Go-Actions/CheckForUpdates@main
+        uses: Duikmeester/AL-Go-Actions/CheckForUpdates@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           templateUrl: ${{ env.TemplateUrl }}
@@ -87,13 +87,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Read settings
-        uses: microsoft/AL-Go-Actions/ReadSettings@main
+        uses: Duikmeester/AL-Go-Actions/ReadSettings@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           project: ${{ matrix.project }}
 
       - name: Read secrets (PR)
-        uses: microsoft/AL-Go-Actions/ReadSecrets@main
+        uses: Duikmeester/AL-Go-Actions/ReadSecrets@hosted
         if: github.event_name == 'pull_request'
         env:
           secrets: ${{ toJson(secrets) }}
@@ -103,7 +103,7 @@ jobs:
           secrets: 'licenseFileUrl,insiderSasToken,KeyVaultCertificateUrl,KeyVaultCertificatePassword,KeyVaultClientId'
 
       - name: Read secrets
-        uses: microsoft/AL-Go-Actions/ReadSecrets@main
+        uses: Duikmeester/AL-Go-Actions/ReadSecrets@hosted
         if: github.event_name != 'pull_request'
         env:
           secrets: ${{ toJson(secrets) }}
@@ -113,7 +113,7 @@ jobs:
           secrets: 'licenseFileUrl,insiderSasToken,CodeSignCertificateUrl,CodeSignCertificatePassword,KeyVaultCertificateUrl,KeyVaultCertificatePassword,KeyVaultClientId,StorageContext'
 
       - name: Run pipeline
-        uses: microsoft/AL-Go-Actions/RunPipeline@main
+        uses: Duikmeester/AL-Go-Actions/RunPipeline@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           Project: ${{ matrix.project }}
@@ -184,7 +184,7 @@ jobs:
 
       - name: Cleanup
         if: always()
-        uses: microsoft/AL-Go-Actions/PipelineCleanup@main
+        uses: Duikmeester/AL-Go-Actions/PipelineCleanup@hosted
         with:
           parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
           Project: ${{ matrix.project }}
@@ -213,10 +213,10 @@ jobs:
           Write-Host "::set-output name=envName::$envName"
 
       - name: Read settings
-        uses: microsoft/AL-Go-Actions/ReadSettings@main
+        uses: Duikmeester/AL-Go-Actions/ReadSettings@hosted
 
       - name: Read secrets
-        uses: microsoft/AL-Go-Actions/ReadSecrets@main
+        uses: Duikmeester/AL-Go-Actions/ReadSecrets@hosted
         env:
           secrets: ${{ toJson(secrets) }}
         with:
@@ -259,7 +259,7 @@ jobs:
           Write-Host "set-output name=environmentName::$environmentName"
 
       - name: Deploy
-        uses: microsoft/AL-Go-Actions/Deploy@main
+        uses: Duikmeester/AL-Go-Actions/Deploy@hosted
         env:
           authContext: '${{ steps.authContext.outputs.authContext }}'
         with:
@@ -270,7 +270,7 @@ jobs:
 
   PostProcess:
     if: always()
-    runs-on: [windows-latest]
+    runs-on: [self-hosted]
     needs: [Initialization, Build, Deploy]
     steps:
       - name: Checkout
@@ -278,7 +278,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: microsoft/AL-Go-Actions/WorkflowPostProcess@main
+        uses: Duikmeester/AL-Go-Actions/WorkflowPostProcess@hosted
         with:
           eventId: 'DO0091'
           telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
